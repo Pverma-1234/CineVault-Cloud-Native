@@ -2,14 +2,34 @@ const verifyToken = require("../middleware/authMiddleware");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 const router = express.Router();
 
 const {
     findUserByEmail,
+    findUserById,
     createUser
 } = require("../models/userModel");
+function isValidEmail(email) {
+    if (typeof email !== "string" || email.length > 254) {
+        return false;
+    }
+
+    const normalizedEmail = email.trim();
+
+    const atIndex = normalizedEmail.indexOf("@");
+    const lastAtIndex = normalizedEmail.lastIndexOf("@");
+    const lastDotIndex = normalizedEmail.lastIndexOf(".");
+
+    return (
+        atIndex > 0 &&
+        atIndex === lastAtIndex &&
+        lastDotIndex > atIndex + 1 &&
+        lastDotIndex < normalizedEmail.length - 1 &&
+        !normalizedEmail.includes(" ")
+    );
+}
 
 // USER REGISTRATION
 router.post("/register", async (req, res) => {
@@ -24,14 +44,21 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        const normalizedEmail = email.trim().toLowerCase();
+if (typeof email !== "string") {
+    return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address."
+    });
+}
 
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide a valid email address."
-            });
-        }
+const normalizedEmail = email.trim().toLowerCase();
+
+if (!isValidEmail(normalizedEmail)) {
+    return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address."
+    });
+}
 
         if (password.length < 8) {
             return res.status(400).json({
@@ -169,7 +196,7 @@ router.post("/login", async (req, res) => {
 // GET /profile - Protected route
 router.get("/profile", verifyToken, async (req, res) => {
     try {
-        const { findUserById } = require("../models/userModel");
+        // const { findUserById } = require("../models/userModel");
 
         const user = await findUserById(req.user.userId);
 

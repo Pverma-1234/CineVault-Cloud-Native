@@ -159,4 +159,7 @@ async function createUsersTable() {
     }
 }
 
-createUsersTable();
+createUsersTable().catch((error) => {
+    console.error("Unexpected error during users table setup:", error);
+    process.exitCode = 1;
+});

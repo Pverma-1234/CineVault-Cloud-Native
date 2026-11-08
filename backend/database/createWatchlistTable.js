@@ -84,4 +84,7 @@ async function createWatchlistTable() {
     }
 }
 
-createWatchlistTable();
+createWatchlistTable().catch((error) => {
+    console.error("Unexpected error during watchlist setup:", error);
+    process.exitCode = 1;
+});

@@ -17,4 +17,7 @@ async function testConnection() {
     }
 }
 
-testConnection();
+testConnection().catch((error) => {
+    console.error("Unexpected error during DynamoDB connection test:", error);
+    process.exitCode = 1;
+});
