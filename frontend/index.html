@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CineVault | Discover Movies</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+
+        <div class="logo">
+            Cine<span>Vault</span>
+        </div>
+
+        <nav>
+            <a href="#" class="active">Home</a>
+            <a href="#trending">Trending</a>
+            <a href="#popular">Popular</a>
+            <a href="#watchlist">My Watchlist</a>
+        </nav>
+
+        <div class="nav-actions">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search movies..."
+            >
+
+            <button id="searchBtn">Search</button>
+
+        </div>
+
+    </header>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="tagline">YOUR NEXT MOVIE EXPERIENCE STARTS HERE</p>
+
+            <h1>
+                Discover Movies.<br>
+                <span>Experience Stories.</span>
+            </h1>
+
+            <p class="hero-description">
+                Explore trending movies, discover hidden gems
+                and build your personal movie collection.
+            </p>
+
+            <a href="#trending" class="hero-btn">
+                Explore Movies
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- Search Results -->
+    <main class="container">
+
+        <section id="searchSection" class="movie-section hidden">
+
+            <h2>Search Results</h2>
+
+            <div id="searchResults" class="movie-grid"></div>
+
+        </section>
+
+
+        <!-- Trending Movies -->
+        <section id="trending" class="movie-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">WHAT'S HOT</p>
+                    <h2>Trending Movies</h2>
+                </div>
+            </div>
+
+            <div id="trendingMovies" class="movie-grid"></div>
+
+        </section>
+
+
+        <!-- Popular Movies -->
+        <section id="popular" class="movie-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">AUDIENCE FAVOURITES</p>
+                    <h2>Popular Movies</h2>
+                </div>
+            </div>
+
+            <div id="popularMovies" class="movie-grid"></div>
+
+        </section>
+
+
+        <!-- Watchlist -->
+        <section id="watchlist" class="movie-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">YOUR COLLECTION</p>
+                    <h2>My Watchlist</h2>
+                </div>
+            </div>
+
+            <div id="watchlistMovies" class="movie-grid"></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Movie Details Modal -->
+    <div id="movieModal" class="modal hidden">
+
+        <div class="modal-content">
+
+            <button id="closeModal" class="close-btn">&times;</button>
+
+            <img id="modalPoster" src="" alt="Movie poster">
+
+            <div class="modal-info">
+
+                <h2 id="modalTitle"></h2>
+
+                <p id="modalRating"></p>
+
+                <p id="modalDescription"></p>
+
+                <button id="modalWatchlistBtn">
+                    Add to Watchlist
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+
+    <!-- Footer -->
+    <footer>
+
+        <h2>CineVault</h2>
+
+        <p>
+            Discover. Explore. Experience Cinema.
+        </p>
+
+        <p class="copyright">
+            © 2026 CineVault. All rights reserved.
+        </p>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
