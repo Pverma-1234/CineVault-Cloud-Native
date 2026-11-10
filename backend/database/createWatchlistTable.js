@@ -84,7 +84,15 @@ async function createWatchlistTable() {
     }
 }
 
-createWatchlistTable().catch((error) => {
-    console.error("Unexpected error during watchlist setup:", error);
-    process.exitCode = 1;
-});
+// Export function for unit testing
+module.exports = {
+    createWatchlistTable
+};
+
+// Execute setup only when this file is run directly
+if (require.main === module) {
+    createWatchlistTable().catch((error) => {
+        console.error("Unexpected error during watchlist setup:", error);
+        process.exitCode = 1;
+    });
+}

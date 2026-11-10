@@ -1,6 +1,12 @@
 # Use official Node.js Alpine image
 FROM node:24-alpine
 
+# Install the latest available Alpine security patches
+RUN apk upgrade --no-cache
+
+# Update npm and its bundled dependencies
+RUN npm install --global npm@latest
+
 # Set working directory
 WORKDIR /app
 
@@ -9,6 +15,11 @@ COPY --chown=node:node package.json package-lock.json ./
 
 # Install production dependencies
 RUN npm ci --omit=dev
+
+# Remove npm and npx from the production image
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    /usr/local/bin/npm \
+    /usr/local/bin/npx
 
 # Copy only required application files
 COPY --chown=node:node app.js server.js ./

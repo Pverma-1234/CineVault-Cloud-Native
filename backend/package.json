@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --dns-result-order=ipv4first server.js",
-    "dev": "nodemon --exec \"node --dns-result-order=ipv4first\" server.js",
+    "dev": "node --watch --dns-result-order=ipv4first server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch"
   },
@@ -15,7 +15,7 @@
   "type": "commonjs",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1164.0",
-    "@aws-sdk/lib-dynamodb": "^3.1163.0",
+    "@aws-sdk/lib-dynamodb": "^3.1164.0",
     "axios": "^1.21.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -25,7 +25,12 @@
   },
   "devDependencies": {
     "jest": "^30.5.2",
-    "nodemon": "^3.1.14",
     "supertest": "^7.3.2"
+  },
+  "overrides": {
+    "jest": {
+      "glob": "14.0.4",
+      "minimatch": "11.0.5"
+    }
   }
 }

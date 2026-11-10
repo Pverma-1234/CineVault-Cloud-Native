@@ -17,7 +17,18 @@ async function testConnection() {
     }
 }
 
-testConnection().catch((error) => {
-    console.error("Unexpected error during DynamoDB connection test:", error);
-    process.exitCode = 1;
-});
+// Export function for unit testing
+module.exports = {
+    testConnection
+};
+
+// Execute only when run directly
+if (require.main === module) {
+    testConnection().catch((error) => {
+        console.error(
+            "Unexpected error during DynamoDB connection test:",
+            error
+        );
+        process.exitCode = 1;
+    });
+}

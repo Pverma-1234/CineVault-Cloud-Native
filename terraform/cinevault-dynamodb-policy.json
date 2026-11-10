@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CineVaultDynamoDBAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:ap-south-1:238913835139:table/CineVaultUsers",
+        "arn:aws:dynamodb:ap-south-1:238913835139:table/CineVaultUsers/index/EmailIndex",
+        "arn:aws:dynamodb:ap-south-1:238913835139:table/CineVaultWatchlist"
+      ]
+    }
+  ]
+}

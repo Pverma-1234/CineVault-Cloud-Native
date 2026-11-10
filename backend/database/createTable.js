@@ -159,7 +159,16 @@ async function createUsersTable() {
     }
 }
 
-createUsersTable().catch((error) => {
-    console.error("Unexpected error during users table setup:", error);
-    process.exitCode = 1;
-});
+// Export functions for unit testing
+module.exports = {
+    createUsersTable,
+    waitForTableActive
+};
+
+// Execute setup only when this file is run directly
+if (require.main === module) {
+    createUsersTable().catch((error) => {
+        console.error("Unexpected error during users table setup:", error);
+        process.exitCode = 1;
+    });
+}
