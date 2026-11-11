@@ -1,88 +1,100 @@
+
 services:
 
-  # FRONTEND 
+  # FRONTEND
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-
     container_name: cinevault-frontend
-
     ports:
       - "8080:80"
-
     depends_on:
       - backend
-
     restart: unless-stopped
 
 
-  # BACKEND 
+  # BACKEND
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-
     container_name: cinevault-backend
-
     ports:
       - "5000:5000"
-
     env_file:
       - ./backend/.env
-
     environment:
       PORT: 5000
       DYNAMODB_ENDPOINT: http://dynamodb:8000
-
     depends_on:
       - dynamodb
-
     restart: unless-stopped
 
 
-  # DATABASE 
+  # DATABASE - DYNAMODB LOCAL
   dynamodb:
     image: amazon/dynamodb-local:latest
-
     container_name: cinevault-dynamodb
-
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-
     working_dir: /home/dynamodblocal
-
     ports:
       - "8000:8000"
-
     volumes:
       - dynamodb-data:/home/dynamodblocal/data
-
     restart: unless-stopped
 
-    # JENKINS CI/CD
+
+  # JENKINS CI/CD
   jenkins:
     build:
       context: ./jenkins
       dockerfile: Dockerfile
-
     container_name: cinevault-jenkins
-
     privileged: true
-
     user: root
-
     ports:
       - "8081:8080"
       - "50000:50000"
-
     volumes:
       - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-
     restart: unless-stopped
 
 
-#  PERSISTENT VOLUME 
+  # PROMETHEUS MONITORING
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cinevault-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+
+  # GRAFANA DASHBOARD
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cinevault-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+
+# PERSISTENT VOLUMES
 volumes:
   dynamodb-data:
   jenkins-data:
+  prometheus-data:
+  grafana-data:

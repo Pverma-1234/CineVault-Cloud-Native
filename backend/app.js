@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const { register } = require("./config/metrics");
+const metricsMiddleware = require("./middleware/metricsMiddleware");
 
 const watchlistRoutes = require("./routes/watchlistRoutes");
 const movieRoutes = require("./routes/movieRoutes");
@@ -33,12 +35,26 @@ app.use(cors({
 
 app.use(express.json());
 
+// Prometheus HTTP metrics middleware
+app.use(metricsMiddleware);
+
 // Health check
 app.get("/health", (req, res) => {
     res.status(200).json({
         success: true,
         message: "CineVault backend is running!"
     });
+});
+
+// Prometheus metrics endpoint
+app.get("/metrics", async (req, res) => {
+    try {
+        res.set("Content-Type", register.contentType);
+        res.end(await register.metrics());
+    } catch (error) {
+        console.error("Error generating metrics:", error);
+        res.status(500).end("Unable to generate metrics");
+    }
 });
 
 // Movie APIs
