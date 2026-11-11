@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinevault-frontend
+  namespace: cinevault
+  labels:
+    app: cinevault-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cinevault-frontend
+  template:
+    metadata:
+      labels:
+        app: cinevault-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: 238913835139.dkr.ecr.ap-south-1.amazonaws.com/cinevault-frontend:v2
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi

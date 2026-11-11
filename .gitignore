@@ -26,3 +26,5 @@ Thumbs.db
 # Screenshots and documentation images
 docs/screenshots/
 desktop.ini
+
+backend/.env.k8s

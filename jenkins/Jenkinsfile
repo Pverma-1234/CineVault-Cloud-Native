@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out CineVault source code'
+                checkout scm
+            }
+        }
+
+        stage('Environment Check') {
+            steps {
+                echo 'Checking build environment'
+
+                sh 'docker --version'
+                sh 'aws --version'
+                sh 'trivy --version'
+                sh 'git --version'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                echo 'Building CineVault backend image'
+
+                sh '''
+                    docker build \
+                    -t cinevault-backend:${BUILD_NUMBER} \
+                    ./backend
+                '''
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo 'Building CineVault frontend image'
+
+                sh '''
+                    docker build \
+                    -t cinevault-frontend:${BUILD_NUMBER} \
+                    ./frontend
+                '''
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo 'CineVault CI pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'CineVault CI pipeline failed. Check the logs.'
+        }
+    }
+}

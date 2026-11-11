@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinevault-backend
+  namespace: cinevault
+  labels:
+    app: cinevault-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cinevault-backend
+  template:
+    metadata:
+      labels:
+        app: cinevault-backend
+    spec:
+      serviceAccountName: cinevault-backend
+      containers:
+        - name: backend
+          image: 238913835139.dkr.ecr.ap-south-1.amazonaws.com/cinevault-backend:v2
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "5000"
+            - name: AWS_REGION
+              value: "ap-south-1"
+            - name: TMDB_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cinevault-backend-secrets
+                  key: TMDB_ACCESS_TOKEN
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cinevault-backend-secrets
+                  key: JWT_SECRET
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

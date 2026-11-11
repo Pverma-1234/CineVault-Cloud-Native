@@ -1,14 +1,13 @@
-# Use lightweight Nginx image
 FROM nginx:alpine
 
-# Remove default Nginx website
+RUN apk upgrade --no-cache
+
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy frontend files into Nginx directory
 COPY . /usr/share/nginx/html/
 
-# Expose HTTP port
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

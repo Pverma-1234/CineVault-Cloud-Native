@@ -7,8 +7,8 @@
 // 1. API CONFIGURATION
 // ==========================================
 
-const API_BASE_URL = "http://localhost:5000/api/movies";
-const WATCHLIST_API_URL = "http://localhost:5000/api/watchlist";
+const API_BASE_URL = "/api/movies";
+const WATCHLIST_API_URL = "/api/watchlist";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 const PLACEHOLDER_IMAGE =
