@@ -1,13 +1,16 @@
+
 pipeline {
     agent any
 
     options {
         timestamps()
         disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     stages {
 
+        // STAGE 1: CHECKOUT
         stage('Checkout') {
             steps {
                 echo 'Checking out CineVault source code'
@@ -15,6 +18,7 @@ pipeline {
             }
         }
 
+        // STAGE 2: ENVIRONMENT CHECK
         stage('Environment Check') {
             steps {
                 echo 'Checking build environment'
@@ -23,12 +27,46 @@ pipeline {
                 sh 'aws --version'
                 sh 'trivy --version'
                 sh 'git --version'
+                sh 'node --version'
+                sh 'npm --version'
             }
         }
 
+        // STAGE 3: AUTOMATED TESTING
+        stage('Automated Testing') {
+            steps {
+                dir('backend') {
+                    echo 'Installing backend dependencies'
+
+                    sh 'npm ci'
+
+                    echo 'Running Jest automated tests'
+
+                    sh 'npm test -- --coverage'
+                }
+            }
+
+            post {
+                always {
+                    dir('backend') {
+                        script {
+                            if (fileExists('coverage/junit.xml')) {
+                                echo 'JUnit report found'
+                            }
+
+                            if (fileExists('coverage/lcov.info')) {
+                                echo 'Coverage report generated'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // STAGE 4: BUILD BACKEND
         stage('Build Backend') {
             steps {
-                echo 'Building CineVault backend image'
+                echo 'Building CineVault backend Docker image'
 
                 sh '''
                     docker build \
@@ -38,9 +76,10 @@ pipeline {
             }
         }
 
+        // STAGE 5: BUILD FRONTEND
         stage('Build Frontend') {
             steps {
-                echo 'Building CineVault frontend image'
+                echo 'Building CineVault frontend Docker image'
 
                 sh '''
                     docker build \
@@ -49,7 +88,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
@@ -59,6 +97,10 @@ pipeline {
 
         failure {
             echo 'CineVault CI pipeline failed. Check the logs.'
+        }
+
+        always {
+            echo 'CineVault Jenkins pipeline execution finished.'
         }
     }
 }

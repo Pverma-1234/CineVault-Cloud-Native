@@ -1,10 +1,11 @@
+
 FROM jenkins/jenkins:lts-jdk21
 
 USER root
 
-# Install required tools
+# Install required system tools and Node.js
 RUN apt-get update && \
-    apt-get install -y docker.io awscli curl git wget gnupg && \
+    apt-get install -y docker.io awscli curl git wget gnupg nodejs npm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
