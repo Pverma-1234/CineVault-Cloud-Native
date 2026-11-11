@@ -4,8 +4,13 @@ const mockListen = jest.fn((port, callback) => {
     return mockServer;
 });
 
+
 jest.mock("../app", () => ({
     listen: mockListen
+}));
+
+jest.mock("dotenv", () => ({
+    config: jest.fn()
 }));
 
 describe("server.js", () => {
@@ -28,7 +33,7 @@ describe("server.js", () => {
         });
 
         expect(mockListen).toHaveBeenCalledWith(
-            "5000",
+            5000,
             expect.any(Function)
         );
 
