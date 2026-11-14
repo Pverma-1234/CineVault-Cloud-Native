@@ -1,4 +1,4 @@
-# CineVault --- Cloud-Native Movie Discovery Platform
+<!-- # CineVault --- Cloud-Native Movie Discovery Platform
 
 ```{=html}
 <p align="center">
@@ -517,4 +517,274 @@ Lovely Professional University
 Scale.`</strong>`{=html}
 ```{=html}
 </p>
+``` -->
+# CineVault — Cloud-Native Movie Discovery Platform
+
+A movie discovery application built to demonstrate a practical DevOps workflow across application development, containerization, CI, AWS deployment, Kubernetes operations, observability, performance testing, and autoscaling.
+
+**Repository:** [Pverma-1234/CineVault-Cloud-Native](https://github.com/Pverma-1234/CineVault-Cloud-Native)
+
+![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)
+![Docker](https://img.shields.io/badge/Containers-Docker-2496ED?logo=docker&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-326CE5?logo=kubernetes&logoColor=white)
+![AWS](https://img.shields.io/badge/Cloud-AWS-232F3E?logo=amazonaws&logoColor=white)
+![Jenkins](https://img.shields.io/badge/CI-Jenkins-D24939?logo=jenkins&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Metrics-Prometheus-E6522C?logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Observability-Grafana-F46800?logo=grafana&logoColor=white)
+
+---
+
+## Overview
+
+CineVault is a React-based movie discovery application backed by a Node.js and Express API. The application is packaged into Docker images, validated through a Jenkins CI pipeline, stored in Amazon ECR, and deployed to Amazon EKS.
+
+The project extends beyond deployment: backend metrics are collected by Prometheus and visualized in Grafana, k6 is used for smoke and staged load testing, and Kubernetes Horizontal Pod Autoscaling (HPA) is configured and verified under controlled load.
+
+> **CI/CD scope:** The verified Jenkins pipeline performs source checkout, environment validation, backend tests, and frontend/backend Docker image builds. The EKS deployment was configured and verified separately; this repository does not claim that Jenkins automatically deploys to EKS.
+
+## Architecture and workflow
+
+The diagram below reflects the components implemented and verified in this project. The frontend is exposed through a Kubernetes **NodePort** service; the backend uses an internal **ClusterIP** service. No Route 53 or AWS Application Load Balancer is included in this implementation.
+
+![CineVault complete DevOps workflow](docs/cinevault-devops-workflow.png)
+
+### Jenkins CI pipeline
+
+![Jenkins CI pipeline overview](docs/jenkins-ci-pipeline.svg)
+
+The Jenkins pipeline checks out the repository, validates the build environment, installs backend dependencies, runs automated tests, and builds the backend and frontend Docker images.
+
+## Technology stack
+
+| Area | Technologies | Role in the project |
+|---|---|---|
+| Frontend | React, JavaScript, Nginx | Movie discovery interface and static web serving |
+| Backend | Node.js, Express.js | REST API and application logic |
+| Data | Amazon DynamoDB, DynamoDB Local | Cloud persistence and local development |
+| Movie catalogue | TMDB API | External movie information |
+| Containers | Docker, Docker Compose | Image creation and local multi-service environment |
+| CI | Jenkins, GitHub | Source checkout, validation, tests, and image builds |
+| Testing | Jest, Supertest | Backend and API tests |
+| Code quality | SonarQube | Static analysis and code-quality review |
+| Image security | Trivy | Container image vulnerability scanning |
+| Registry | Amazon ECR | Container image storage |
+| Cloud platform | Amazon EKS, Kubernetes | Managed Kubernetes deployment |
+| Workload identity | EKS Pod Identity, IAM | Backend access to AWS resources |
+| Metrics | Prometheus, prom-client | Application and runtime metrics |
+| Dashboards | Grafana | Metrics visualization |
+| Load testing | Grafana k6 | Smoke and staged load tests |
+| Autoscaling | Metrics Server, Kubernetes HPA | CPU metrics and backend pod scaling |
+
+## Implemented capabilities
+
+### Application and containerization
+- React frontend served through Nginx.
+- Node.js/Express backend with application APIs and a health endpoint.
+- Separate Dockerfiles for frontend and backend.
+- Docker Compose environment for the application, DynamoDB Local, Jenkins, Prometheus, and Grafana.
+- Backend metrics exposed through `/metrics`.
+
+### CI, automated testing, and image security
+- Jenkins pipeline configured from the GitHub repository.
+- Verified Jenkins run completed checkout, environment validation, automated tests, and both Docker image builds.
+- **70 backend automated tests passed** in the verified Jenkins run.
+- The verified Jenkins run reported approximately **83.9% line coverage**.
+- SonarQube analysis and Trivy image scans were performed during project validation.
+
+### AWS and Kubernetes deployment
+- Frontend and backend images published to Amazon ECR.
+- Application deployed to an Amazon EKS cluster in `ap-south-1`.
+- Frontend exposed through a Kubernetes **NodePort Service on port `30080`**.
+- Backend exposed internally through a Kubernetes **ClusterIP Service on port `5000`**.
+- EKS Pod Identity configured for backend access to DynamoDB.
+- Kubernetes Secrets used for sensitive application configuration.
+- Metrics Server installed and node/pod metrics verified.
+
+### Observability
+- Backend instrumentation implemented using `prom-client`.
+- Prometheus configured to scrape the backend `/metrics` endpoint every 15 seconds.
+- Grafana dashboard created: **CineVault Observability Dashboard**.
+- Dashboard panels cover CPU usage, resident memory, HTTP request rate, P95 response duration, total HTTP requests, and backend availability.
+
+### Performance testing with k6
+
+The following are results from the recorded test runs. Both scripts target the `/health` endpoint.
+
+| Test | Configuration | Observed result |
+|---|---|---|
+| Smoke test | 1 virtual user for 10 seconds | 10 requests; 20/20 checks passed; 0% failed requests; P95 55.46 ms |
+| Staged load test | Up to 20 virtual users over 2 minutes | 1,325 requests; 2,650/2,650 checks passed; 0% failed requests; average 12.42 ms; P95 48.2 ms; maximum 184.94 ms |
+
+These results validate health-endpoint responsiveness under the tested load. They are not a production-capacity guarantee and do not represent performance testing of every business endpoint.
+
+### Kubernetes Horizontal Pod Autoscaling
+
+- CPU-based HPA configured for the `cinevault-backend` deployment.
+- CPU utilization target: **70% of the pod CPU request**.
+- Minimum replicas: **1**; maximum replicas: **3**.
+- During the controlled load-generator test, CPU utilization reached **228%** of the CPU request and HPA scaled backend replicas from **1 to 3**.
+- After the load stopped and CPU utilization returned to approximately **1%**, HPA scaled the deployment back from **3 to 1**.
+- Final verification showed the frontend and backend deployments available, pods running, and the EKS worker node ready.
+
+## Repository structure
+
+```text
+CineVault-Cloud-Native/
+├── backend/
+│   ├── config/
+│   │   └── metrics.js
+│   ├── middleware/
+│   │   └── metricsMiddleware.js
+│   ├── Dockerfile
+│   ├── app.js
+│   └── package.json
+├── frontend/
+│   └── Dockerfile
+├── infrastructure/
+├── jenkins/
+│   └── Jenkinsfile
+├── kubernetes/
+├── load-testing/
+│   ├── smoke-test.js
+│   └── load-test.js
+├── monitoring/
+│   └── prometheus/
+│       └── prometheus.yml
+├── security/
+├── docs/
+│   ├── cinevault-devops-workflow.png
+│   └── jenkins-ci-pipeline.svg
+└── docker-compose.yml
 ```
+
+This is a high-level view; additional files in the repository are intentionally omitted.
+
+## Run locally
+
+### Prerequisites
+- Git
+- Node.js and npm
+- Docker Desktop with Docker Compose
+- TMDB API access token
+- Required application environment variables
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Pverma-1234/CineVault-Cloud-Native.git
+cd CineVault-Cloud-Native
+```
+
+### 2. Configure environment
+
+Create the backend environment file expected by the application and populate it locally. Never commit `.env` files, API tokens, JWT secrets, AWS credentials, or private keys.
+
+Configuration used by the application includes `PORT`, `AWS_REGION`, `TMDB_ACCESS_TOKEN`, `JWT_SECRET`, and `DYNAMODB_ENDPOINT` for local DynamoDB development.
+
+For local AWS access, use an appropriate AWS identity mechanism. In EKS, the configured EKS Pod Identity role is used rather than embedding long-lived AWS keys in the container image.
+
+### 3. Start the local stack
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+### 4. Run backend tests
+
+```bash
+cd backend
+npm ci
+npm test -- --coverage
+```
+
+## Local service endpoints
+
+These addresses are for a local development environment; they are not public internet URLs.
+
+| Service | Local address |
+|---|---|
+| Frontend | http://localhost:8080 |
+| Backend health | http://localhost:5000/health |
+| Backend metrics | http://localhost:5000/metrics |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+| DynamoDB Local | http://localhost:8000 |
+| Jenkins | http://localhost:8081 |
+
+For the deployed EKS frontend, the Kubernetes Service is a NodePort on `30080`. Access depends on the current worker-node public IP and network/security-group rules. No stable public application URL or custom domain is configured in this project, so a permanent live URL is not listed here.
+
+## Monitoring and load testing
+
+### Prometheus and Grafana
+Prometheus configuration is stored at `monitoring/prometheus/prometheus.yml`. Inside the Docker Compose network, Prometheus scrapes the backend service using `backend:5000`.
+
+Open Prometheus at `http://localhost:9090` and confirm that the `cinevault-backend` target is **UP**. Open Grafana at `http://localhost:3000`, configure Prometheus as a data source using `http://prometheus:9090`, and view the **CineVault Observability Dashboard**.
+
+### Run k6 tests
+
+Run the smoke test from the repository root:
+
+```bash
+docker run --rm -v "${PWD}/load-testing:/scripts" grafana/k6 run /scripts/smoke-test.js
+```
+
+Run the staged load test:
+
+```bash
+docker run --rm -v "${PWD}/load-testing:/scripts" grafana/k6 run /scripts/load-test.js
+```
+
+The scripts use `host.docker.internal` to reach the local backend from the k6 container. Start and verify the backend before running a test. Avoid aggressive tests against shared or production infrastructure.
+
+## Kubernetes verification
+
+Useful commands:
+
+```bash
+kubectl get nodes
+kubectl get deployments -n cinevault
+kubectl get services -n cinevault
+kubectl get pods -n cinevault -o wide
+kubectl get hpa -n cinevault
+kubectl top nodes
+kubectl top pods -n cinevault
+```
+
+The backend HPA was configured with a 70% CPU target, a minimum of one replica, and a maximum of three replicas. Inspect its current state with:
+
+```bash
+kubectl describe hpa cinevault-backend -n cinevault
+```
+
+## Security and operational notes
+
+- Do not commit `.env` files, API tokens, JWT secrets, AWS credentials, kubeconfig files, or private keys.
+- Store sensitive values securely and restrict access using IAM and Kubernetes RBAC.
+- Use EKS Pod Identity for workload access to AWS services where configured.
+- Review SonarQube and Trivy findings before production use; a successful build alone does not prove an application or image is vulnerability-free.
+- The verified frontend Service is a NodePort. This implementation does **not** include Route 53 or an AWS Application Load Balancer.
+- HPA scales backend pods; it does not automatically add worker nodes.
+- The recorded k6 tests target `/health`, not every application endpoint.
+- AWS resources can continue to incur charges while provisioned. Review and stop billable resources when they are no longer required, after preserving project evidence and data.
+
+## Future improvements
+
+The following are possible next steps, not claims of implemented features:
+- Add image scanning and automated ECR publishing as explicit Jenkins stages.
+- Add a controlled continuous deployment workflow to EKS.
+- Add integration and load tests for movie search, authentication, and watchlist APIs.
+- Configure alert rules and notification routing in Prometheus/Grafana.
+- Add an ingress controller, TLS, and a managed load balancer if a production-facing endpoint is required.
+- Add infrastructure lifecycle automation and cost controls.
+
+## Author
+
+**Prince Verma**  
+B.Tech — Computer Science and Engineering  
+Lovely Professional University
+
+---
+
+*CineVault — Discover. Organize. Observe. Scale.*
