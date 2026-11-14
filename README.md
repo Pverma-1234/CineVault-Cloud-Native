@@ -522,7 +522,7 @@ Scale.`</strong>`{=html}
 
 A movie discovery application built to demonstrate a practical DevOps workflow across application development, containerization, CI, AWS deployment, Kubernetes operations, observability, performance testing, and autoscaling.
 
-**Repository:** [Pverma-1234/CineVault-Cloud-Native](https://github.com/Pverma-1234/CineVault-Cloud-Native)
+<!-- **Repository:** [Pverma-1234/CineVault-Cloud-Native](https://github.com/Pverma-1234/CineVault-Cloud-Native) -->
 
 ![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)
@@ -545,13 +545,13 @@ The project extends beyond deployment: backend metrics are collected by Promethe
 
 ## Architecture and workflow
 
-The diagram below reflects the components implemented and verified in this project. The frontend is exposed through a Kubernetes **NodePort** service; the backend uses an internal **ClusterIP** service. No Route 53 or AWS Application Load Balancer is included in this implementation.
+The diagram below reflects the components implemented and verified in this project. The frontend is exposed through a Kubernetes **NodePort** service; the backend uses an internal **ClusterIP** service.
 
 ![CineVault complete DevOps workflow](docs/cinevault-devops-workflow.png)
 
 ### Jenkins CI pipeline
 
-![Jenkins CI pipeline overview](docs/jenkins-ci-pipeline.svg)
+![Jenkins CI pipeline overview](docs/jenkins-ci-flow.png)
 
 The Jenkins pipeline checks out the repository, validates the build environment, installs backend dependencies, runs automated tests, and builds the backend and frontend Docker images.
 
